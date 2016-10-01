@@ -108,7 +108,9 @@ class PullUpListView extends React.Component {
           <View>
             <ActivityIndicator
               size='large'
-              animating={true}/>
+              animating={true}
+              color={this.props.tintColor}
+            />
             <Text>{this.props.title}</Text>
           </View>
         );
@@ -151,7 +153,8 @@ class PullUpListView extends React.Component {
 
     if (this.state.statusCode === STATUS_PRE_LOAD) {
 
-      const renderCircleDeg = (- 9 * (OFFSET_Y_MAX - contentOffset.y)) - 270;
+      const renderCircleDeg = (- 9 * (OFFSET_Y_MAX - contentOffset.y)) - 9 * this.props.pullDistance;
+
       this.indicatorCircle.refreshRenderedDeg(renderCircleDeg);
     }
 
@@ -207,7 +210,7 @@ PullUpListView.propTypes = {
 
 PullUpListView.defaultProps = {
   pullDistance: 50,
-  tintColor: '#B7B7B7',
+  tintColor: 'gray',
   title: 'Load More...',
   titleColor: '#000000'
 };
