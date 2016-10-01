@@ -1,0 +1,20 @@
+{
+  "name": "react-native-pull-up-listview",
+  "version": "0.0.1",
+  "description": "A listview for react-native, provide an ability of pulling up to load more list row.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NanaMorse/react-native-pull-up-listview.git"
+  },
+  "keywords": [
+    "react-native",
+    "pull-up"
+  ],
+  "author": "Morse_Guo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NanaMorse/react-native-pull-up-listview/issues"
+  },
+  "homepage": "https://github.com/NanaMorse/react-native-pull-up-listview#readme"
+}

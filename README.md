@@ -2,6 +2,12 @@
 
 A listview for react-native, provide an ability of pulling up to load more list row.
 
+## Install
+
+``` shell
+$ npm i --save react-native-pull-up-listview
+```
+
 ## Props
 
 - `loading` bool (required)

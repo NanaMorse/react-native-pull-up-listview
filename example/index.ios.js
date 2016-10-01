@@ -13,7 +13,7 @@ import {
   ListView
 } from 'react-native';
 
-import PullUpListView from './react-native-pull-up-listview';
+import PullUpListView from 'react-native-pull-up-listview';
 
 const dataList = [
   {
