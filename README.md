@@ -2,6 +2,8 @@
 
 A listview for react-native, provide an ability of pulling up to load more list row.
 
+![image](http://github.com/NanaMorse/react-native-pull-up-listview/raw/master/example/snapshoots/snapshot.gif)
+
 ## Install
 
 ``` shell
