@@ -47,6 +47,96 @@ const dataList = [
   {
     text: 'dataRow'
   },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
+  {
+    text: 'dataRow'
+  },
 ];
 
 const loadMoreDataList = [
@@ -74,7 +164,7 @@ const styles = StyleSheet.create({
   list: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 5,
+    padding: 20,
     borderColor: '#000',
     borderBottomWidth: 1
   }

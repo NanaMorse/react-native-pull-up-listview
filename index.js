@@ -4,7 +4,9 @@ import {
   View,
   Text,
   ListView,
-  PanResponder
+  PanResponder,
+  Animated,
+  Easing
 } from 'react-native';
 
 import IndicatorCircle from './IndicatorCircle';
@@ -13,18 +15,22 @@ const PropTypes = React.PropTypes;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    position: 'relative',
+    flex: 1,
   },
 
   footer: {
     alignItems: 'center',
-    paddingTop: 10
   }
 });
 
 const STATUS_NORMAL = 0;
 const STATUS_PRE_LOAD = 1;
 const STATUS_LOADING = 3;
+
+const pullToCompleteRange = 120;
+
+let loadMoreInvoked = false;
 
 class PullUpListView extends React.Component {
 
@@ -33,7 +39,7 @@ class PullUpListView extends React.Component {
 
     this.state = {
       statusCode: props.loading ? STATUS_LOADING : STATUS_NORMAL,
-      refreshing: false,
+      footerTopAnimatedValue: new Animated.Value(0)
     };
 
     this.responderHandling = false;
@@ -49,6 +55,7 @@ class PullUpListView extends React.Component {
       onPanResponderRelease: () => {
 
         this.responderHandling = false;
+        loadMoreInvoked = false;
 
         if (this.state.statusCode === STATUS_PRE_LOAD) {
           this.listViewRef.scrollTo({
@@ -87,14 +94,26 @@ class PullUpListView extends React.Component {
     if (statusCode === STATUS_NORMAL) return null;
 
     if (statusCode === STATUS_PRE_LOAD) {
+
+      const preLoadStyle = [styles.footer, {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: this.state.footerTopAnimatedValue.interpolate({
+          inputRange: [this.containerSize.height, this.containerSize.height + pullToCompleteRange],
+          outputRange: [this.containerSize.height, this.containerSize.height + pullToCompleteRange / 16 * 10]
+        })
+      }];
+
       footerContext = (
-        <View style={styles.footer}>
+        <Animated.View style={preLoadStyle}>
           <IndicatorCircle
             ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
-            onCircleComplete={this.props.onLoadMore}
+            onCircleComplete={() => {this.props.onLoadMore(); loadMoreInvoked = true}}
           />
           <Text>{this.props.title}</Text>
-        </View>
+        </Animated.View>
       );
     }
 
@@ -107,11 +126,7 @@ class PullUpListView extends React.Component {
       );
     }
 
-    return (
-      <View style={styles.footer}>
-        {footerContext}
-      </View>
-    );
+    return footerContext;
   }
 
   onScroll(e) {
@@ -124,6 +139,8 @@ class PullUpListView extends React.Component {
 
     if (contentOffset.y > (OFFSET_Y_MAX + this.props.pullDistance) && this.responderHandling) {
 
+      if (loadMoreInvoked) return;
+
       if (this.state.statusCode === STATUS_NORMAL) {
 
         this.OFFSET_Y_MAX = OFFSET_Y_MAX;
@@ -131,6 +148,8 @@ class PullUpListView extends React.Component {
         this.setState({
           statusCode: STATUS_PRE_LOAD
         });
+
+        this.state.footerTopAnimatedValue.setValue(containerHeight);
       }
     }
 
@@ -144,7 +163,15 @@ class PullUpListView extends React.Component {
 
     if (this.state.statusCode === STATUS_PRE_LOAD) {
 
-      const renderCircleDeg = (- 9 * (OFFSET_Y_MAX - contentOffset.y)) - 9 * this.props.pullDistance;
+      const currentPullRange = contentOffset.y - OFFSET_Y_MAX;
+
+      Animated.timing(this.state.footerTopAnimatedValue, {
+        toValue: containerHeight - currentPullRange,
+        easing: Easing.linear,
+        duration: 1
+      }).start();
+
+      const renderCircleDeg = 360 / pullToCompleteRange * (currentPullRange - this.props.pullDistance);
 
       this.indicatorCircle.refreshRenderedDeg(renderCircleDeg);
     }
@@ -162,7 +189,7 @@ class PullUpListView extends React.Component {
     };
 
     const listViewProps = {
-      renderFooter: this.renderFooter.bind(this),
+      //renderFooter: this.renderFooter.bind(this),
       onScroll: mixFuncs(this.onScroll.bind(this), this.props.onScroll),
       onLoading: this.props.onLoading,
 
@@ -178,6 +205,7 @@ class PullUpListView extends React.Component {
     return (
       <View {...containerProps}>
         <ListView {...this.props} {...this.panResponder.panHandlers} {...listViewProps}/>
+        {this.renderFooter()}
       </View>
     );
   }
@@ -204,7 +232,7 @@ PullUpListView.defaultProps = {
   tintColor: 'gray',
   title: 'Load More...',
   titleColor: '#000000',
-  scrollEventThrottle: 100
+  scrollEventThrottle: 1
 };
 
 
