@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  ListView
+  ListView,
+  RefreshControl
 } from 'react-native';
 
 import PullUpListView from 'react-native-pull-up-listview';
@@ -86,6 +87,7 @@ class example extends Component {
     super();
 
     this.state = {
+      refreshing: false,
       loading: false,
       dataList: dataList
     };
@@ -114,12 +116,26 @@ class example extends Component {
     }, 2000);
   }
 
+  onRefresh() {
+    this.setState({
+      refreshing: true
+    });
+
+    setTimeout(() => {
+      this.setState({
+        refreshing: false
+      });
+    }, 2000)
+  }
+
   render() {
     const pullUpListViewProps = {
       dataSource: this.dataSource.cloneWithRows(this.state.dataList),
       renderRow: this.renderList.bind(this),
       loading: this.state.loading,
-      onLoadMore: this.onLoadMore.bind(this)
+      onLoadMore: this.onLoadMore.bind(this),
+
+      refreshControl: <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
     };
 
     return (

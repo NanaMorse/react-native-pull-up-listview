@@ -4,8 +4,7 @@ import {
   View,
   Text,
   ListView,
-  PanResponder,
-  ActivityIndicator
+  PanResponder
 } from 'react-native';
 
 import IndicatorCircle from './IndicatorCircle';
@@ -88,32 +87,24 @@ class PullUpListView extends React.Component {
     if (statusCode === STATUS_NORMAL) return null;
 
     if (statusCode === STATUS_PRE_LOAD) {
-
-      const preloadStyle = {
-        alignItems: 'center'
-      };
-
       footerContext = (
-        <View style={preloadStyle}>
+        <View style={styles.footer}>
           <IndicatorCircle
             ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
             onCircleComplete={this.props.onLoadMore}
           />
+          <Text>{this.props.title}</Text>
         </View>
       );
     }
 
     if (statusCode === STATUS_LOADING) {
-      footerContext = this.props.loadingElement || (
-          <View>
-            <ActivityIndicator
-              size='large'
-              animating={true}
-              color={this.props.tintColor}
-            />
-            <Text>{this.props.title}</Text>
-          </View>
-        );
+      footerContext = (
+        <View style={styles.footer}>
+          <IndicatorCircle animated={true}/>
+          <Text>{this.props.title}</Text>
+        </View>
+      );
     }
 
     return (
@@ -177,7 +168,7 @@ class PullUpListView extends React.Component {
 
       ref: (listView) => { this.listViewRef = listView; },
 
-      scrollEventThrottle: 100,
+      scrollEventThrottle: this.props.scrollEventThrottle,
 
       style: {
         position: 'relative'
@@ -209,10 +200,11 @@ PullUpListView.propTypes = {
 };
 
 PullUpListView.defaultProps = {
-  pullDistance: 50,
+  pullDistance: 10,
   tintColor: 'gray',
   title: 'Load More...',
-  titleColor: '#000000'
+  titleColor: '#000000',
+  scrollEventThrottle: 100
 };
 
 

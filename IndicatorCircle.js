@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
 
 const PropTypes = React.PropTypes;
 
@@ -34,7 +34,8 @@ class IndicatorCircle extends React.Component {
     super();
 
     this.state = {
-      renderDeg: 0
+      renderDeg: 0,
+      animatedRotateValue: new Animated.Value(0)
     };
 
     completed = false;
@@ -46,6 +47,14 @@ class IndicatorCircle extends React.Component {
     if (linesNum <= 0) linesNum = 1;
 
     if (linesNum > 12) linesNum = 12;
+
+    let lineColorArray = [];
+
+    if (this.props.animated) {
+      linesNum = 12;
+      // todo, calculate colors array by props.color
+      lineColorArray = ['#A3A3A3', '#AFAFAF', '#B7B7B7', '#BFBFBF', '#C7C7C7', '#CECECE'];
+    }
 
     const linesElementArray = [];
 
@@ -62,7 +71,9 @@ class IndicatorCircle extends React.Component {
       };
 
       const lineStyle = {
-        backgroundColor: this.props.color,
+        backgroundColor: this.props.animated ?
+          (lineColorArray[i] || lineColorArray[lineColorArray.length - 1])
+          : this.props.color,
         width: this.props.size * 10 / 36
       };
 
@@ -83,7 +94,6 @@ class IndicatorCircle extends React.Component {
     this.props.onCircleComplete();
   }
 
-
   refreshRenderedDeg(deg) {
     this.setState({
       renderDeg: deg
@@ -94,11 +104,80 @@ class IndicatorCircle extends React.Component {
     });
   }
 
+  componentDidMount() {
+    if (this.props.animated) {
+      this.startContainerRotateAnimate();
+    }
+  }
+
+  componentDidUpdate(props) {
+    if (this.props.animated) {
+      this.startContainerRotateAnimate();
+    }
+  }
+
+  startContainerRotateAnimate() {
+    this.state.animatedRotateValue.setValue(0);
+    Animated.timing(this.state.animatedRotateValue, {
+      toValue: 360,
+      duration: 800,
+      easing: Easing.linear
+    }).start(this.startContainerRotateAnimate.bind(this));
+  }
+
   render() {
+
+    const containerStyle = [
+      styles.container,
+      {
+        height: this.props.size,
+        width: this.props.size
+      }
+    ];
+
+    let containerRotateStyle;
+
+    if (this.props.animated) {
+
+      const [inputRange, outputRange] = (() => {
+        let degStart = 0;
+
+        const inputRange = [];
+        const outputRange = [];
+
+        do {
+
+          inputRange.push(degStart);
+          outputRange.push(`${degStart}deg`);
+
+          degStart += degBetweenLines;
+
+          if (degStart <= 360) {
+            inputRange.push(degStart - 0.1);
+            outputRange.push(`${degStart - degBetweenLines}deg`);
+          }
+
+        } while (degStart <= 360);
+
+        return [inputRange, outputRange];
+      })();
+
+      containerRotateStyle = {
+        transform: [
+          {
+            rotate: this.state.animatedRotateValue.interpolate({
+              inputRange: inputRange,
+              outputRange: outputRange
+            })
+          }
+        ]
+      }
+    }
+
     return (
-      <View style={[styles.container, {height: this.props.size, width: this.props.size}]}>
+      <Animated.View style={[containerStyle, containerRotateStyle]}>
         {this.generateCircleLines()}
-      </View>
+      </Animated.View>
     )
   }
 }
@@ -106,7 +185,8 @@ class IndicatorCircle extends React.Component {
 IndicatorCircle.propTypes = {
   color: PropTypes.string,
   size: PropTypes.number,
-  onCircleComplete: PropTypes.func
+  onCircleComplete: PropTypes.func,
+  animated: PropTypes.bool
 };
 
 IndicatorCircle.defaultProps = {
