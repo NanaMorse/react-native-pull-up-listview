@@ -194,8 +194,4 @@ IndicatorCircle.defaultProps = {
   onCircleComplete: () => { console.log('CircleComplete') }
 };
 
-function colorStringToRgba() {
-  //
-}
-
 export default IndicatorCircle;

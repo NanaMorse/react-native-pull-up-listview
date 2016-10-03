@@ -15,12 +15,14 @@ const PropTypes = React.PropTypes;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'transparent',
     position: 'relative',
-    flex: 1,
+    overflow: 'hidden',
+    flex: 1
   },
 
   footer: {
-    alignItems: 'center',
+    alignItems: 'center'
   }
 });
 
@@ -28,7 +30,7 @@ const STATUS_NORMAL = 0;
 const STATUS_PRE_LOAD = 1;
 const STATUS_LOADING = 3;
 
-const pullToCompleteRange = 120;
+let pullToCompleteRange;
 
 let loadMoreInvoked = false;
 
@@ -119,8 +121,14 @@ class PullUpListView extends React.Component {
     }
 
     if (statusCode === STATUS_LOADING) {
+
+      const loadingStyle = [styles.footer, {
+        paddingTop: 10,
+        backgroundColor: this.props.style && this.props.style.backgroundColor
+      }];
+
       footerContext = (
-        <View style={styles.footer}>
+        <View style={loadingStyle}>
           <IndicatorCircle animated={true}  color={this.props.tintColor}/>
           <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </View>
@@ -145,6 +153,8 @@ class PullUpListView extends React.Component {
       if (this.state.statusCode === STATUS_NORMAL) {
 
         this.OFFSET_Y_MAX = OFFSET_Y_MAX;
+
+        pullToCompleteRange = containerHeight / 5;
 
         this.setState({
           statusCode: STATUS_PRE_LOAD
@@ -190,22 +200,17 @@ class PullUpListView extends React.Component {
     };
 
     const listViewProps = {
-      //renderFooter: this.renderFooter.bind(this),
       onScroll: mixFuncs(this.onScroll.bind(this), this.props.onScroll),
       onLoading: this.props.onLoading,
 
       ref: (listView) => { this.listViewRef = listView; },
 
-      scrollEventThrottle: this.props.scrollEventThrottle,
-
-      style: {
-        position: 'relative'
-      }
+      scrollEventThrottle: this.props.scrollEventThrottle
     };
 
     return (
       <View {...containerProps}>
-        <ListView {...this.props} {...this.panResponder.panHandlers} {...listViewProps}/>
+        <ListView {...this.props} {...this.panResponder.panHandlers} {...listViewProps} />
         {this.renderFooter()}
       </View>
     );

@@ -34,109 +34,7 @@ const dataList = [
   },
   {
     text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
-  {
-    text: 'dataRow'
-  },
+  }
 ];
 
 const loadMoreDataList = [
@@ -226,9 +124,7 @@ class example extends Component {
       onLoadMore: this.onLoadMore.bind(this),
       refreshControl: <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>,
 
-      tintColor: 'red',
-      title: "I'm loading!",
-      titleColor: 'blue'
+      title: "I'm loading!"
     };
 
     return (
