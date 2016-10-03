@@ -111,8 +111,9 @@ class PullUpListView extends React.Component {
           <IndicatorCircle
             ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
             onCircleComplete={() => {this.props.onLoadMore(); loadMoreInvoked = true}}
+            color={this.props.tintColor}
           />
-          <Text>{this.props.title}</Text>
+          <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </Animated.View>
       );
     }
@@ -120,8 +121,8 @@ class PullUpListView extends React.Component {
     if (statusCode === STATUS_LOADING) {
       footerContext = (
         <View style={styles.footer}>
-          <IndicatorCircle animated={true}/>
-          <Text>{this.props.title}</Text>
+          <IndicatorCircle animated={true}  color={this.props.tintColor}/>
+          <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </View>
       );
     }

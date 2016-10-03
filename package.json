@@ -1,6 +1,6 @@
 {
   "name": "react-native-pull-up-listview",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "A listview for react-native, provide an ability of pulling up to load more list row.",
   "main": "index.js",
   "repository": {

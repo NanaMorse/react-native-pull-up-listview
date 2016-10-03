@@ -224,8 +224,11 @@ class example extends Component {
       renderRow: this.renderList.bind(this),
       loading: this.state.loading,
       onLoadMore: this.onLoadMore.bind(this),
+      refreshControl: <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>,
 
-      refreshControl: <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh.bind(this)}/>
+      tintColor: 'red',
+      title: "I'm loading!",
+      titleColor: 'blue'
     };
 
     return (

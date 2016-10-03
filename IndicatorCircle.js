@@ -48,12 +48,11 @@ class IndicatorCircle extends React.Component {
 
     if (linesNum > 12) linesNum = 12;
 
-    let lineColorArray = [];
+    let lineOpacityArray = [];
 
     if (this.props.animated) {
       linesNum = 12;
-      // todo, calculate colors array by props.color
-      lineColorArray = ['#A3A3A3', '#AFAFAF', '#B7B7B7', '#BFBFBF', '#C7C7C7', '#CECECE'];
+      lineOpacityArray = [1, 0.9, 0.8, 0.7, 0.6, 0.5];
     }
 
     const linesElementArray = [];
@@ -71,9 +70,8 @@ class IndicatorCircle extends React.Component {
       };
 
       const lineStyle = {
-        backgroundColor: this.props.animated ?
-          (lineColorArray[i] || lineColorArray[lineColorArray.length - 1])
-          : this.props.color,
+        backgroundColor: this.props.color,
+        opacity: this.props.animated ? (lineOpacityArray[i] || lineOpacityArray[lineOpacityArray.length - 1]) : 1,
         width: this.props.size * 10 / 36
       };
 
@@ -118,6 +116,7 @@ class IndicatorCircle extends React.Component {
 
   startContainerRotateAnimate() {
     this.state.animatedRotateValue.setValue(0);
+
     Animated.timing(this.state.animatedRotateValue, {
       toValue: 360,
       duration: 800,
@@ -194,5 +193,9 @@ IndicatorCircle.defaultProps = {
   size: 36,
   onCircleComplete: () => { console.log('CircleComplete') }
 };
+
+function colorStringToRgba() {
+  //
+}
 
 export default IndicatorCircle;
