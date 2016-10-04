@@ -38,6 +38,8 @@ class IndicatorCircle extends React.Component {
       animatedRotateValue: new Animated.Value(0)
     };
 
+    this.unmount = false;
+
     completed = false;
   }
 
@@ -96,7 +98,7 @@ class IndicatorCircle extends React.Component {
     this.setState({
       renderDeg: deg
     }, () => {
-      if (this.state.renderDeg >= 360) {
+      if (this.state.renderDeg >= (360 - degBetweenLines)) {
         this.onCircleComplete();
       }
     });
@@ -114,6 +116,10 @@ class IndicatorCircle extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.unmount = true;
+  }
+
   startContainerRotateAnimate() {
     this.state.animatedRotateValue.setValue(0);
 
@@ -121,7 +127,9 @@ class IndicatorCircle extends React.Component {
       toValue: 360,
       duration: 800,
       easing: Easing.linear
-    }).start(this.startContainerRotateAnimate.bind(this));
+    }).start(() => {
+      if(!this.unmount) this.startContainerRotateAnimate();
+    });
   }
 
   render() {
