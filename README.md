@@ -10,6 +10,8 @@ A listview for react-native, provide an ability of pulling up to load more list 
 $ npm i --save react-native-pull-up-listview
 ```
 
+PS: If you find something wrong with this repo, try to up to date within npm and test again. Else you can create an issue and I will figure it out as soon as possible, thx!
+
 ## Props
 
 - `loading` bool (required)
