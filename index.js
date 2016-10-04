@@ -122,9 +122,11 @@ class PullUpListView extends React.Component {
 
     if (statusCode === STATUS_LOADING) {
 
+      const listStyle = StyleSheet.flatten(this.props.style);
+
       const loadingStyle = [styles.footer, {
         paddingTop: 10,
-        backgroundColor: this.props.style && this.props.style.backgroundColor
+        backgroundColor: listStyle ? listStyle.backgroundColor : 'transparent'
       }];
 
       footerContext = (
