@@ -30,7 +30,7 @@ const STATUS_NORMAL = 0;
 const STATUS_PRE_LOAD = 1;
 const STATUS_LOADING = 3;
 
-let pullToCompleteRange;
+let pullToCompleteRange = 120;
 
 let loadMoreInvoked = false;
 
