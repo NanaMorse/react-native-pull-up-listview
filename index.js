@@ -114,6 +114,7 @@ class PullUpListView extends React.Component {
             ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
             onCircleComplete={() => {this.props.onLoadMore(); loadMoreInvoked = true}}
             color={this.props.tintColor}
+            size={this.props.size}
           />
           <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </Animated.View>
@@ -131,7 +132,7 @@ class PullUpListView extends React.Component {
 
       footerContext = (
         <View style={loadingStyle}>
-          <IndicatorCircle animated={true}  color={this.props.tintColor}/>
+          <IndicatorCircle animated={true}  color={this.props.tintColor}  size={this.props.size}/>
           <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </View>
       );
@@ -230,6 +231,7 @@ PullUpListView.propTypes = {
   tintColor: PropTypes.string,
   title: PropTypes.string,
   titleColor: PropTypes.string,
+  size: PropTypes.number,
 
   loading: PropTypes.bool,
   onLoadMore: PropTypes.func
@@ -240,6 +242,7 @@ PullUpListView.defaultProps = {
   tintColor: 'gray',
   title: 'Load More...',
   titleColor: '#000000',
+  size: 36,
   scrollEventThrottle: 1
 };
 

@@ -58,12 +58,13 @@ class IndicatorCircle extends React.Component {
     }
 
     const linesElementArray = [];
+    const circleSize = this.props.size;
 
     for (let i = 0; i < linesNum; i++ ) {
 
       const lineWrapperRotateStyle = {
-        height: this.props.size,
-        width: this.props.size,
+        height: circleSize,
+        width: circleSize,
         transform: [
           {
             rotate: `${degBetweenLines * i - 90}deg`
@@ -74,7 +75,7 @@ class IndicatorCircle extends React.Component {
       const lineStyle = {
         backgroundColor: this.props.color,
         opacity: this.props.animated ? (lineOpacityArray[i] || lineOpacityArray[lineOpacityArray.length - 1]) : 1,
-        width: this.props.size * 10 / 36
+        width: circleSize * 10 / 36
       };
 
       linesElementArray.push(

@@ -26,6 +26,10 @@ PS: If you find something wrong with this repo, try to up to date within npm and
 
 	The indicator color.
 	
+- `size` number (option, default = 36)
+
+	The indicator's size.
+	
 - `title` string (option, default = 'load more...')
 
 	The title displayed under the loadMore indicator.
