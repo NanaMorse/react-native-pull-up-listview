@@ -26,13 +26,34 @@ const styles = StyleSheet.create({
   }
 });
 
-const STATUS_NORMAL = 0;
-const STATUS_PRE_LOAD = 1;
-const STATUS_LOADING = 3;
+// status concepts constants
+const STATUS_NORMAL = Symbol('STATUS_NORMAL');
+const STATUS_PRE_LOAD = Symbol('STATUS_PRE_LOAD');
+const STATUS_LOADING = Symbol('STATUS_LOADING');
 
-let pullToCompleteRange = 120;
+// describe how long you should pull to make the indicator circle running complete
+// it will be set as 1/5 of the listView's container's height
+// when the container's onLayout method invoking
+let pullToCompleteRange = null;
 
+// animated footer's top value, it changes when you pulling up the listView over it's max offset
+const footerAnimatedTopValue = new Animated.Value(0);
+
+// will be true on PanResponderMoving
+let responderHandling = false;
+
+// will be true when indicator circle completed
 let loadMoreInvoked = false;
+
+// cache container's size for calculating listView's max offset Y
+let containerSize;
+
+// cache footer's size
+let footerSize;
+
+const pullRangeCoverToTopValueRatio = 5 / 8;
+
+const footerPaddingVertical = 10;
 
 class PullUpListView extends React.Component {
 
@@ -40,39 +61,30 @@ class PullUpListView extends React.Component {
     super();
 
     this.state = {
-      statusCode: props.loading ? STATUS_LOADING : STATUS_NORMAL,
-      footerTopAnimatedValue: new Animated.Value(0)
+      statusCode: props.loading ? STATUS_LOADING : STATUS_NORMAL
     };
-
-    this.responderHandling = false;
-    this.containerSize = {};
   }
 
   componentWillMount() {
     this.panResponder = PanResponder.create({
       onPanResponderMove: () => {
-        this.responderHandling = true;
+        responderHandling = true;
       },
 
       onPanResponderRelease: () => {
-
-        this.responderHandling = false;
+        responderHandling = false;
         loadMoreInvoked = false;
 
         if (this.state.statusCode === STATUS_PRE_LOAD) {
-          this.listViewRef.scrollTo({
-            y: this.OFFSET_Y_MAX
-          });
+          this.listViewRef.scrollTo({ y: this.OFFSET_Y_MAX });
         }
       }
     });
   }
 
   componentDidMount() {
-    // register all methods for listView instance
-    const methodsList = [
-      'getMetrics', 'scrollTo'
-    ];
+    // register listView instance's methods
+    const methodsList = ['getMetrics', 'scrollTo'];
 
     methodsList.forEach((method) => {
       this[method] = (...args) => {
@@ -82,6 +94,8 @@ class PullUpListView extends React.Component {
   }
 
   componentWillUpdate(props) {
+    // set statusCode according to loading props
+    // todo bad practice
     this.state.statusCode = props.loading ? STATUS_LOADING : STATUS_NORMAL;
   }
 
@@ -97,42 +111,43 @@ class PullUpListView extends React.Component {
 
     if (statusCode === STATUS_PRE_LOAD) {
 
-      const preLoadStyle = [styles.footer, {
+      const containerHeight = containerSize.height;
+
+      const preLoadStyle = {
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: 0,
-        top: this.state.footerTopAnimatedValue.interpolate({
-          inputRange: [this.containerSize.height, this.containerSize.height + pullToCompleteRange],
-          outputRange: [this.containerSize.height, this.containerSize.height + pullToCompleteRange / 16 * 10]
+        top: footerAnimatedTopValue.interpolate({
+          inputRange: [containerHeight, containerHeight + pullToCompleteRange],
+          outputRange: [containerHeight, containerHeight + pullToCompleteRange * pullRangeCoverToTopValueRatio]
         })
-      }];
+      };
 
       footerContext = (
         <Animated.View style={preLoadStyle}>
-          <IndicatorCircle
-            ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
-            onCircleComplete={() => {this.props.onLoadMore(); loadMoreInvoked = true}}
-            color={this.props.tintColor}
-            size={this.props.size}
-          />
-          <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
+          <View style={styles.footer} onLayout={this.onPreLoadFooterLayout.bind(this)}>
+            <IndicatorCircle
+              ref= {(indicatorCircle) => { this.indicatorCircle = indicatorCircle; }}
+              onCircleComplete={() => {this.props.onLoadMore(); loadMoreInvoked = true}}
+              color={this.props.tintColor}
+              size={this.props.size}
+            />
+            <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
+          </View>
         </Animated.View>
       );
     }
 
     if (statusCode === STATUS_LOADING) {
 
-      const listStyle = StyleSheet.flatten(this.props.style);
-
       const loadingStyle = [styles.footer, {
-        paddingTop: 10,
-        backgroundColor: listStyle ? listStyle.backgroundColor : 'transparent'
+        paddingVertical: footerPaddingVertical,
+        backgroundColor: this.props.style && this.props.style.backgroundColor
       }];
 
       footerContext = (
         <View style={loadingStyle}>
-          <IndicatorCircle animated={true}  color={this.props.tintColor}  size={this.props.size}/>
+          <IndicatorCircle animated={true} color={this.props.tintColor} size={this.props.size}/>
           <Text style={{color: this.props.titleColor}}>{this.props.title}</Text>
         </View>
       );
@@ -144,56 +159,59 @@ class PullUpListView extends React.Component {
   onScroll(e) {
     const { contentSize, contentOffset } = e.nativeEvent;
 
-    const containerHeight = this.containerSize.height;
+    const containerHeight = containerSize.height;
     const contentHeight = contentSize.height;
 
     const OFFSET_Y_MAX = containerHeight > contentHeight ? 0 : contentHeight - containerHeight;
 
-    if (contentOffset.y > (OFFSET_Y_MAX + this.props.pullDistance) && this.responderHandling) {
+    // if user pull up listView
+    if (contentOffset.y > OFFSET_Y_MAX && responderHandling) {
 
       if (loadMoreInvoked) return;
 
       if (this.state.statusCode === STATUS_NORMAL) {
 
+        // cache OFFSET_Y_MAX for scroll back when user release handing
         this.OFFSET_Y_MAX = OFFSET_Y_MAX;
 
-        pullToCompleteRange = containerHeight / 5;
+        footerAnimatedTopValue.setValue(containerHeight);
 
-        this.setState({
-          statusCode: STATUS_PRE_LOAD
-        });
-
-        this.state.footerTopAnimatedValue.setValue(containerHeight);
+        this.setState({ statusCode: STATUS_PRE_LOAD });
       }
     }
 
-    else if (contentOffset.y < (this.OFFSET_Y_MAX + this.props.pullDistance)) {
+    // if listView scroll back to normal status
+    else if (contentOffset.y < OFFSET_Y_MAX) {
       if (this.state.statusCode === STATUS_PRE_LOAD) {
-        this.setState({
-          statusCode: STATUS_NORMAL
-        });
+        this.setState({ statusCode: STATUS_NORMAL });
       }
     }
 
-    if (this.state.statusCode === STATUS_PRE_LOAD) {
-
+    // if listView scrolling on preload status, and footer has been initialized
+    if (this.state.statusCode === STATUS_PRE_LOAD && footerSize) {
       const currentPullRange = contentOffset.y - OFFSET_Y_MAX;
 
-      Animated.timing(this.state.footerTopAnimatedValue, {
-        toValue: containerHeight - currentPullRange,
-        easing: Easing.linear,
-        duration: 1
-      }).start();
+      if ( currentPullRange * pullRangeCoverToTopValueRatio < (footerSize.height + footerPaddingVertical)) {
+        Animated.timing(footerAnimatedTopValue, {
+          toValue: containerHeight - currentPullRange,
+          easing: Easing.linear,
+          duration: 0
+        }).start();
+      }
 
-      const renderCircleDeg = 360 / pullToCompleteRange * (currentPullRange - this.props.pullDistance);
-
+      const renderCircleDeg = 360 / pullToCompleteRange * currentPullRange;
       this.indicatorCircle.refreshRenderedDeg(renderCircleDeg);
     }
 
   }
 
   onContainerLayout(e) {
-    this.containerSize = e.nativeEvent.layout;
+    containerSize = e.nativeEvent.layout;
+    pullToCompleteRange = containerSize.height / 5;
+  }
+
+  onPreLoadFooterLayout(e) {
+    footerSize = e.nativeEvent.layout;
   }
 
   render() {
@@ -227,7 +245,6 @@ function mixFuncs(...funcs) {
 }
 
 PullUpListView.propTypes = {
-  pullDistance: PropTypes.number,
   tintColor: PropTypes.string,
   title: PropTypes.string,
   titleColor: PropTypes.string,
@@ -238,12 +255,11 @@ PullUpListView.propTypes = {
 };
 
 PullUpListView.defaultProps = {
-  pullDistance: 10,
   tintColor: 'gray',
   title: 'Load More...',
   titleColor: '#000000',
   size: 36,
-  scrollEventThrottle: 1
+  scrollEventThrottle: 10
 };
 
 
